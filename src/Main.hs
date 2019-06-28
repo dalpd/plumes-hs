@@ -1,4 +1,9 @@
 module Main where
 
+import ParseDat
+
 main :: IO ()
-main = putStrLn "Hello, Haskell!"
+main = do
+  contents <- lines <$> readFile "test"
+  mapM_ (run parsePlumes) contents
+  
