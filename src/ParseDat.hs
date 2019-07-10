@@ -42,6 +42,7 @@ data SimColumns = SimColumns
 
 matchState :: String -> SimState
 matchState = \case
+  " "                     -> DefaultState
   "stream limit reached"  -> StreamLimit
   "bottom hit"            -> BottomHit
   "begin overlap"         -> BeginOverlap
@@ -92,9 +93,41 @@ parseScientific = do
   digits' <- parseInt
   return $ digits ++ "E" ++ digits'
 
---parseMessage :: Parsec.Parsec String () SimState
 parseMessage :: Parsec.Parsec String () String
-parseMessage = undefined
+parseMessage =
+        Parsec.try parse2Message
+    <|> Parsec.try parse3Message
+    <|> Parsec.try parse1Message
+
+
+parse1Message :: Parsec.Parsec String () String
+parse1Message = do
+  Parsec.char ';'
+  return $ " "
+  
+--parseMessage :: Parsec.Parsec String () SimState
+parse2Message :: Parsec.Parsec String () String
+parse2Message = do
+  _ <- Parsec.char ';'
+  Parsec.spaces
+  str1 <- Parsec.many1 Parsec.letter
+  Parsec.spaces
+  str2 <- Parsec.many1 Parsec.letter
+  _ <- Parsec.char ';'
+  return $ str1 ++ " " ++  str2
+
+parse3Message :: Parsec.Parsec String () String
+parse3Message = do
+  Parsec.char ';'
+  Parsec.spaces
+  str1 <- Parsec.many1 Parsec.letter
+  Parsec.spaces
+  str2 <- Parsec.many1 Parsec.letter
+  Parsec.spaces
+  str3 <- Parsec.many1 Parsec.letter
+  Parsec.char ';'
+  return $ str1 ++ " " ++ str2 ++ " " ++ str3
+
   
 parsePlumes :: Parsec.Parsec String () SimColumns
 parsePlumes = do
@@ -124,8 +157,9 @@ parsePlumes = do
   x_posn <- parseNum
   Parsec.spaces
   y_posn <- parseNum
+  msg <- parseMessage
   return $
     SimColumns step depth amb_cur far_dir disprsn p_dia
-               v_angle p_depth polutnt dilutn cl_diln x_posn y_posn (matchState "")
+               v_angle p_depth polutnt dilutn cl_diln x_posn y_posn (matchState msg) 
 
 
