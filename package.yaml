@@ -1,0 +1,33 @@
+name: plumes-hs
+version: 0.1.0.0
+synopsis: A CLI tool to parse and plot simulation data exported from Visual Plumes 
+maintainer: Deniz Alp Durmaz <denizalpd@ogr.iu.edu.tr>
+category: CLI
+license: BSD3
+default-extensions:
+  - OverloadedStrings
+  - RecordWildCards
+  - LambdaCase
+
+ghc-options:
+  -Wall
+
+dependencies:
+  - base
+
+library:
+  source-dirs:
+    - src
+
+  dependencies:    
+    - megaparsec
+    - parsec
+    - path
+    - relude
+    - text
+    - time
+
+executable:
+  main: Main.hs
+  source-dirs:
+    - app

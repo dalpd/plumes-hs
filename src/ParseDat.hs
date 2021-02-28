@@ -1,15 +1,17 @@
 {-# LANGUAGE LambdaCase       #-}
 {-# LANGUAGE FlexibleContexts #-}
 
-module ParseDat where
+module ParseDat
+  ( run,
+    parsePlumes
+  )
+where
 
 import Control.Applicative
 -- import Control.Monad.Identity (Identity)
 
 import Text.Parsec.String (Parser)
 import qualified Text.Parsec as Parsec
-import Text.Parsec ((<?>))
--- import Text.Parsec.Token as ParsecToken
 
 data SimState = StreamLimit 
               | BottomHit 
@@ -71,7 +73,7 @@ parsePositive = do
 
 parseNegative :: Parsec.Parsec String () String
 parseNegative = do
-  Parsec.char '-'
+  _ <- Parsec.char '-'
   s <- parsePositive
   return $ "-" ++ s
 
@@ -81,15 +83,15 @@ parseInt = Parsec.try parsePositive <|> parseNegative
 parseFloat :: Parsec.Parsec String () String
 parseFloat = do
    digits <- Parsec.many1 Parsec.digit
-   Parsec.char '.'
+   _ <- Parsec.char '.'
    digits' <- Parsec.many1 Parsec.digit
    return $ digits ++ "." ++ digits'
 
 parseScientific :: Parsec.Parsec String () String
 parseScientific = do
   digits <- parseFloat <|> parseInt
-  Parsec.oneOf "eE"
-  Parsec.char '+'
+  _ <- Parsec.oneOf "eE"
+  _ <- Parsec.char '+'
   digits' <- parseInt
   return $ digits ++ "E" ++ digits'
 
@@ -102,7 +104,7 @@ parseMessage =
 
 parse1Message :: Parsec.Parsec String () String
 parse1Message = do
-  Parsec.char ';'
+  _ <- Parsec.char ';'
   return $ " "
   
 --parseMessage :: Parsec.Parsec String () SimState
@@ -118,14 +120,14 @@ parse2Message = do
 
 parse3Message :: Parsec.Parsec String () String
 parse3Message = do
-  Parsec.char ';'
+  _ <- Parsec.char ';'
   Parsec.spaces
   str1 <- Parsec.many1 Parsec.letter
   Parsec.spaces
   str2 <- Parsec.many1 Parsec.letter
   Parsec.spaces
   str3 <- Parsec.many1 Parsec.letter
-  Parsec.char ';'
+  _ <- Parsec.char ';'
   return $ str1 ++ " " ++ str2 ++ " " ++ str3
 
   
